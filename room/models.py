@@ -1,5 +1,7 @@
 from statistics import mode
+from telnetlib import STATUS
 from django.db import models
+from django.http import HttpResponse
 
 # Create your models here.
 
@@ -15,9 +17,11 @@ def checkRoomExist(Roomid):
     return False
 
 
-def checkRoomInfo(roomid, roompsw):
+def checkRoomInfo(Roomid, Roompsw):
     pass
+    return True
 
 
 def createValidRoom(Roomid, Roompsw):
     Room.objects.create(roomid=Roomid, roompsw=Roompsw)
+    return HttpResponse('created', status=201)
