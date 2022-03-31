@@ -1,17 +1,27 @@
-from telnetlib import STATUS
 from django.shortcuts import render
 from .models import checkRoomExist, checkRoomInfo, createValidRoom
+from .models import checkUserExist, checkUserValid, createValidUser
 from django.http import HttpResponse
 
 # Create your views here.
 
 
-def createroom(request, roomid, roompsw):
+def createroom(request, roomid):
     if(checkRoomExist(roomid)):
-        return HttpResponse('Room Exist', status=403)
-    if(checkRoomInfo(roomid, roompsw) == False):
-        return HttpResponse('Invalid RoomID or RoomPassword', status=403)
-    return createValidRoom(roomid, roompsw)
+        return HttpResponse('Room Exist', status=201)
+    return createValidRoom(roomid)
+
+
+def joinroom(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist', status=201)
+    if(checkUserExist(roomid, userid)):
+        if(not checkUserValid(roomid, userid, userpsw)):
+            return HttpResponse('Wrong Password', status=201)
+        else:
+            pass
+    else:
+        return createValidUser(roomid, userid, userpsw)
 
 
 def testdjango(request):

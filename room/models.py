@@ -8,20 +8,30 @@ from django.http import HttpResponse
 
 class Room(models.Model):
     roomid = models.CharField(max_length=6)
-    roompsw = models.CharField(max_length=6)
+
+
+class User(models.Model):
+    roomid = models.CharField(max_length=6)
+    userid = models.CharField(max_length=6)
+    userpsw = models.CharField(max_length=6)
 
 
 def checkRoomExist(Roomid):
-    if(Room.objects.filter(roomid=Roomid).exists):
-        return True
-    return False
+    return Room.objects.filter(roomid=Roomid).exists()
 
 
-def checkRoomInfo(Roomid, Roompsw):
-    pass
-    return True
+def createValidRoom(Roomid):
+    Room.objects.create(roomid=Roomid)
+    return HttpResponse('createdRoom', status=201)
 
 
-def createValidRoom(Roomid, Roompsw):
-    Room.objects.create(roomid=Roomid, roompsw=Roompsw)
-    return HttpResponse('created', status=201)
+def checkUserExist(Roomid, Userid):
+    return User.objects.filter(roomid=Roomid, userid=Userid).exists()
+
+
+def checkUserValid(Roomid, Userid, Userpsw):
+    return User.objects.filter(roomid=Roomid, userid=Userid, userpsw=Userpsw).exists()
+
+
+def createValidUser(Roomid, Userid, Userpsw):
+    return HttpResponse('createdUser', status=201)
