@@ -34,4 +34,5 @@ def checkUserValid(Roomid, Userid, Userpsw):
 
 
 def createValidUser(Roomid, Userid, Userpsw):
+    User.objects.create(roomid=Roomid, userid=Userid, userpsw=Userpsw)
     return HttpResponse('createdUser', status=201)

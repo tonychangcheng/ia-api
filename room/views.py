@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import checkRoomExist, checkRoomInfo, createValidRoom
+from .models import checkRoomExist, createValidRoom
 from .models import checkUserExist, checkUserValid, createValidUser
 from django.http import HttpResponse
 
@@ -16,10 +16,10 @@ def joinroom(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist', status=201)
     if(checkUserExist(roomid, userid)):
-        if(not checkUserValid(roomid, userid, userpsw)):
-            return HttpResponse('Wrong Password', status=201)
+        if(checkUserValid(roomid, userid, userpsw)):
+            return HttpResponse('userExistAndValid', status=201)
         else:
-            pass
+            return HttpResponse('Wrong Password', status=201)
     else:
         return createValidUser(roomid, userid, userpsw)
 
