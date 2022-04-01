@@ -1,6 +1,8 @@
+import json
 from django.shortcuts import render
 from .models import checkRoomExist, createValidRoom
 from .models import checkUserExist, checkUserValid, createValidUser
+from .models import getRoomUser
 from django.http import HttpResponse
 
 # Create your views here.
@@ -22,6 +24,13 @@ def joinroom(request, roomid, userid, userpsw):
             return HttpResponse('Wrong Password', status=201)
     else:
         return createValidUser(roomid, userid, userpsw)
+
+
+def getWaitingRoomInfo(request, roomid, userid, userpsw):
+    if(checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse(json.dumps(getRoomUser(roomid)), status=201)
+    else:
+        return HttpResponse('userNotValid', status=201)
 
 
 def testdjango(request):

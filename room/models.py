@@ -12,7 +12,7 @@ class Room(models.Model):
 
 class User(models.Model):
     roomid = models.CharField(max_length=6)
-    userid = models.CharField(max_length=6)
+    userid = models.CharField(max_length=7)
     userpsw = models.CharField(max_length=6)
 
 
@@ -36,3 +36,14 @@ def checkUserValid(Roomid, Userid, Userpsw):
 def createValidUser(Roomid, Userid, Userpsw):
     User.objects.create(roomid=Roomid, userid=Userid, userpsw=Userpsw)
     return HttpResponse('createdUser', status=201)
+
+
+def getRoomUser(Roomid):
+    Users = User.objects.filter(roomid=Roomid)
+    users = []
+    response = {'userCount': len(Users)}
+    useri = 0
+    for user in Users:
+        useri += 1
+        response[f'user{useri}'] = user.userid
+    return response
