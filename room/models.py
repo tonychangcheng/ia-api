@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 class Room(models.Model):
     roomid = models.CharField(max_length=6)
+    roomstatus = models.CharField(max_length=6)
 
 
 class User(models.Model):
@@ -21,7 +22,7 @@ def checkRoomExist(Roomid):
 
 
 def createValidRoom(Roomid):
-    Room.objects.create(roomid=Roomid)
+    Room.objects.create(roomid=Roomid, roomsatus='waiting')
     return HttpResponse('createdRoom', status=201)
 
 
