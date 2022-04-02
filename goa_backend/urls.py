@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from room.views import createroom, joinroom, getWaitingRoomInfo, roomstatus, testdjango
-from room.views import startGame
+from room.views import startGame, userrole, usersusersee
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +26,6 @@ urlpatterns = [
     path('wait/<str:roomid>/<str:userid>/<str:userpsw>/', getWaitingRoomInfo),
     path('status/<str:roomid>/', roomstatus),
     path('start/<str:roomid>/<str:userid>/<str:userpsw>/', startGame),
+    path('userrole/<str:roomid>/<str:userid>/<str:userpsw>/', userrole),
+    path('usersusersee/<str:roomid>/<str:userid>/<str:userpsw>/', usersusersee)
 ]

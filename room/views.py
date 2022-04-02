@@ -1,6 +1,5 @@
 import json
 import random
-from tabnanny import check
 from django import http
 from django.shortcuts import render
 from .models import Room, checkRoomExist, createValidRoom
@@ -90,3 +89,47 @@ def startGame(request, roomid, userid, userpsw):
     thisRoom.roomstatus = 'started'
     thisRoom.save()
     return HttpResponse('Game Started', status=201)
+
+
+def userrole(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist', status=201)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid', status=201)
+    if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
+        return HttpResponse('Room Not Started', status=201)
+
+    # return user's role
+    return HttpResponse(User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).role, status=201)
+
+
+def usersusersee(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist', status=201)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid', status=201)
+    if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
+        return HttpResponse('Room Not Started', status=201)
+
+    # return users that user can see
+    userscount = 0
+    response = {}
+    thisuser = User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw)
+    for user in User.objects.filter(roomid=roomid):
+        if(user.userid == thisuser):
+            continue
+        flag = False
+        ul = user.role
+        tl = thisuser.role
+        flag = flag or (tl == 'Merlin' and (
+            ul == 'Morgana' or ul == 'Assassin' or ul == 'Minion of Mordred' or ul == 'Oberon'))
+        flag = flag or (tl == 'Percival' and (
+            ul == 'Merlin' or ul == 'Morgana'))
+        flag = flag or ((tl == 'Assassin' or tl == 'Morgana' or tl ==
+                        'Mordred' or tl == 'Minion of Mordred') and (ul == 'Assassin' or ul == 'Morgana' or ul ==
+                        'Mordred' or ul == 'Minion of Mordred'))
+        if(flag):
+            userscount += 1
+            response[f'user{userscount}'] = user.userid
+    response['userCount'] = userscount
+    return HttpResponse(json.dumps(response), status=201)
