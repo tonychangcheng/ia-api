@@ -1,5 +1,7 @@
+
 import json
 import random
+from unittest import result
 from django import http
 from django.shortcuts import render
 from .models import Room, checkRoomExist, createValidRoom
@@ -145,7 +147,7 @@ def message(request, roomid, userid, userpsw, messageid):
     if(not Message.objects.filter(roomid=roomid, messageid=messageid).exists()):
         return HttpResponse('Message Does Not Exist', status=201)
     thisroom = Room.objects.get(roomid=roomid)
-    if(messageid == thisroom.messagecount and thisroom.roomfurtherstatus != 'normal'):
+    if(messageid > thisroom.messagecount):
         return HttpResponse('Message Does Not Exist', status=201)
     thismessage = Message.objects.get(roomid=roomid, messageid=messageid)
     response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle,
@@ -156,10 +158,7 @@ def message(request, roomid, userid, userpsw, messageid):
 def messagecount(request, roomid):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist', status=201)
-    response = Room.objects.get(roomid=roomid).messagecount
-    if(Room.objects.get(roomid=roomid).roomfurtherstatus != 'normal'):
-        response -= 1
-    return HttpResponse(response, status=201)
+    return HttpResponse(Room.objects.get(roomid=roomid).messagecount, status=201)
 
 
 def buildteam(request, roomid, userid, userpsw, count):
@@ -210,9 +209,16 @@ def addteammember(request, roomid, userid, userpsw, memberid):
             thisroom.votecontent += ', '
         else:
             thisroom.roomfurtherstatus = 'build'
+            startvote(roomid)
     thisroom.save()
     thismember.save()
     return HttpResponse(thisroom.teammembercountnow, status=201)
+
+
+def startvote(roomid):
+    for user in User.objects.filter(roomid=roomid):
+        user.voted = False
+        user.save()
 
 
 def anybuild(request, roomid, userid, userpsw):
@@ -248,3 +254,94 @@ def anyquest(request, roomid, userid, userpsw):
     if(thisroom.roomstatus != 'started'):
         return HttpResponse('Room Not Started', status=201)
     return HttpResponse(thisroom.roomfurtherstatus == 'quest' and User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).onvote, status=201)
+
+
+def vote(request, roomid, userid, userpsw, choice):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist', status=201)
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid', status=201)
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started', status=201)
+    if(thisroom.roomfurtherstatus == 'normal'):
+        return HttpResponse('No Vote is on Going', status=201)
+    thisuser = User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw)
+    thisuser.voted = True
+    thisuser.result = choice == 'yes'
+    thisuser.save()
+
+    #
+    if(thisroom.roomfurtherstatus == 'build'):
+        votedusercount = len(User.objects.filter(roomid=roomid, voted=True))
+    else:
+        votedusercount = len(User.objects.filter(
+            roomid=roomid, voted=True, onvote=True))
+    # build->quest?
+    if(thisroom.roomfurtherstatus == 'build' and votedusercount == len(User.objects.filter(roomid=roomid))):
+
+        # message.messageusers
+        totalcount = len(User.objects.filter(roomid=roomid, voted=True))
+        messageusers = ''
+        count = 0
+        for user in User.objects.filter(roomid=roomid, voted=True):
+            count += 1
+            messageusers += user.userid
+            if(count < totalcount):
+                messageusers += ', '
+
+        # message.message1users
+        agree = len(User.objects.filter(
+            roomid=roomid, voted=True, result=True))
+        agreeuser = f'{agree} Yes: '
+        count = 0
+        for user in User.objects.filter(roomid=roomid, voted=True, result=True):
+            count += 1
+            agreeuser += user.userid
+            if(count < agree):
+                agreeuser += ', '
+
+        # message.message2users
+        disagree = len(User.objects.filter(
+            roomid=roomid, voted=True, result=False))
+        disagreeuser = f'{disagree} No: '
+        count = 0
+        for user in User.objects.filter(roomid=roomid, voted=True, result=False):
+            count += 1
+            disagreeuser += user.userid
+            if(count < disagree):
+                disagreeuser += ', '
+        Message.objects.create(roomid=roomid, messageid=thisroom.messagecount+1,
+                               messagetitle=f'Team Building Proposal#{thisroom.messagecount-thisroom.questcount+1}', messageusers=messageusers, message1users=agreeuser, message2users=disagreeuser)
+        thisroom.messagecount += 1
+        if(agree > disagree):
+            thisroom.questcount += 1
+            thisroom.roomfurtherstatus = 'quest'
+            startvote(roomid)
+        else:
+            thisroom.roomfurtherstatus = 'normal'
+        thisroom.save()
+    # quest->over?
+    if(thisroom.roomfurtherstatus == 'quest' and votedusercount == len(User.objects.filter(roomid=roomid, onvote=True))):
+
+        # message.messageusers
+        totalcount = len(User.objects.filter(
+            roomid=roomid, voted=True, onvote=True))
+        messageusers = ''
+        count = 0
+        for user in User.objects.filter(roomid=roomid, voted=True, onvote=True):
+            count += 1
+            messageusers += user.userid
+            if(count < totalcount):
+                messageusers += ', '
+
+        agree = len(User.objects.filter(roomid=roomid,
+                    voted=True, onvote=True, result=True))
+        disagree = len(User.objects.filter(
+            roomid=roomid, voted=True, onvote=True, result=False))
+        Message.objects.create(roomid=roomid, messageid=thisroom.messagecount+1,
+                               messagetitle=f'Quest#{thisroom.questcount}', messageusers=messageusers, message1users=f'{agree} Yes', message2users=f'{disagree} No')
+        thisroom.messagecount += 1
+        thisroom.roomfurtherstatus = 'normal'
+        thisroom.save()
+    return HttpResponse('Successfully Vote', status=201)

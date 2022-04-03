@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from room.views import createroom, joinroom, getWaitingRoomInfo, roomstatus, testdjango
 from room.views import startGame, userrole, usersusersee, message, messagecount, buildteam
-from room.views import addteammember, anybuild, votecontent, anyquest
+from room.views import addteammember, anybuild, votecontent, anyquest, vote
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,5 +35,6 @@ urlpatterns = [
     path('addteammember/<str:roomid>/<str:userid>/<str:userpsw>/<str:memberid>/', addteammember),
     path('anybuild/<str:roomid>/<str:userid>/<str:userpsw>/', anybuild),
     path('votecontent/<str:roomid>/<str:userid>/<str:userpsw>/', votecontent),
-    path('anyquest/<str:roomid>/<str:userid>/<str:userpsw>/', anyquest)
+    path('anyquest/<str:roomid>/<str:userid>/<str:userpsw>/', anyquest),
+    path('vote/<str:roomid>/<str:userid>/<str:userpsw>/<str:choice>/', vote)
 ]

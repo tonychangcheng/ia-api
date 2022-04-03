@@ -27,13 +27,15 @@ class User(models.Model):
     userpsw = models.CharField(max_length=6)
     role = models.CharField(max_length=23)
     onvote = models.BooleanField()
+    voted = models.BooleanField()
     result = models.BooleanField()
 
 
 class Message(models.Model):
     roomid = models.CharField(max_length=6)
     messageid = models.IntegerField()
-    messagetitle = models.CharField(max_length=25)  # Team Building Proposal#1
+    messagetitle = models.CharField(max_length=25)  # Title
+    messageusers = models.CharField(max_length=200)  # users
     message1users = models.CharField(max_length=200)  # Agree
     message2users = models.CharField(max_length=200)  # Disagree
 
