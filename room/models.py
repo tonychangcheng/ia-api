@@ -46,7 +46,7 @@ def checkRoomExist(Roomid):
 
 def createValidRoom(Roomid):
     Room.objects.create(roomid=Roomid, roomstatus='waiting',
-                        messagecount=0, roomfurtherstatus='normal', questcount=0)
+                        messagecount=0, roomfurtherstatus='normal', questcount=0, votetitle='', votecontent='', teammembercount=0, teammembercountnow=0, teambuilder='')
     return HttpResponse('createdRoom', status=201)
 
 
@@ -60,7 +60,7 @@ def checkUserValid(Roomid, Userid, Userpsw):
 
 def createValidUser(Roomid, Userid, Userpsw):
     User.objects.create(roomid=Roomid, userid=Userid,
-                        userpsw=Userpsw, role='not distrubuted')
+                        userpsw=Userpsw, role='not distrubuted', onvote=False, voted=False, result=False)
     return HttpResponse('createdUser', status=201)
 
 

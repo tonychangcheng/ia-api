@@ -27,7 +27,10 @@ def joinroom(request, roomid, userid, userpsw):
         else:
             return HttpResponse('Wrong Password', status=201)
     else:
-        return createValidUser(roomid, userid, userpsw)
+        if(Room.objects.get(roomid=roomid).roomstatus != 'waiting'):
+            return HttpResponse('Room Already Started', status=201)
+        else:
+            return createValidUser(roomid, userid, userpsw)
 
 
 def roomstatus(request, roomid):
@@ -150,7 +153,7 @@ def message(request, roomid, userid, userpsw, messageid):
     if(messageid > thisroom.messagecount):
         return HttpResponse('Message Does Not Exist', status=201)
     thismessage = Message.objects.get(roomid=roomid, messageid=messageid)
-    response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle,
+    response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle, 'messageusers': thismessage.messageusers,
                 'message1users': thismessage.message1users, 'message2users': thismessage.message2users}
     return HttpResponse(json.dumps(response), status=201)
 
@@ -285,7 +288,7 @@ def vote(request, roomid, userid, userpsw, choice):
         totalcount = len(User.objects.filter(roomid=roomid, voted=True))
         messageusers = ''
         count = 0
-        for user in User.objects.filter(roomid=roomid, voted=True):
+        for user in User.objects.filter(roomid=roomid, onvote=True):
             count += 1
             messageusers += user.userid
             if(count < totalcount):
