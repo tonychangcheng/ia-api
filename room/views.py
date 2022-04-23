@@ -20,43 +20,43 @@ def get_csrf_token(request):
 
 def createroom(request, roomid):
     if(checkRoomExist(roomid)):
-        return HttpResponse('Room Exist', status=201)
+        return HttpResponse('Room Exist', status=409)
     return createValidRoom(roomid)
 
 
 def joinroom(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     if(checkUserExist(roomid, userid)):
         if(checkUserValid(roomid, userid, userpsw)):
-            return HttpResponse('userExistAndValid', status=201)
+            return HttpResponse('userExistAndValid')
         else:
-            return HttpResponse('Wrong Password', status=201)
+            return HttpResponse('Wrong Password', status=401)
     else:
         if(Room.objects.get(roomid=roomid).roomstatus != 'waiting'):
-            return HttpResponse('Room Already Started', status=201)
+            return HttpResponse('Room Already Started', status=409)
         else:
             return createValidUser(roomid, userid, userpsw)
 
 
 def roomstatus(request, roomid):
     if(checkRoomExist(roomid)):
-        return HttpResponse(getRoomStatus(roomid), status=201)
+        return HttpResponse(getRoomStatus(roomid))
     else:
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
 
 
 def getWaitingRoomInfo(request, roomid, userid, userpsw):
     if(checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse(json.dumps(getRoomUser(roomid)), status=201)
+        return HttpResponse(json.dumps(getRoomUser(roomid)))
     else:
-        return HttpResponse('userNotValid', status=201)
+        return HttpResponse('userNotValid', status=401)
 
 
 def testdjango(request):
     data = json.loads(request.body)
     res = data['data1']
-    return HttpResponse(res, status=201)
+    return HttpResponse(res)
 
 
 character = ['Merlin', 'Percival', 'Morgana',
@@ -78,11 +78,11 @@ template = ['', '', '', '', '', [5, 0, 1, 2, 3, 4],
 
 def startGame(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid', status=201)
+        return HttpResponse('User Not Valid', status=401)
     if(Room.objects.get(roomid=roomid).roomstatus == 'started'):
-        return HttpResponse('Room Already Started', status=201)
+        return HttpResponse('Room Already Started', status=409)
 
     # generate role
     userNumInRomm = len(User.objects.filter(roomid=roomid))
@@ -106,23 +106,23 @@ def startGame(request, roomid, userid, userpsw):
 
 def userrole(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid', status=201)
+        return HttpResponse('User Not Valid', status=401)
     if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
-        return HttpResponse('Room Not Started', status=201)
+        return HttpResponse('Room Not Started', status=409)
 
     # return user's role
-    return HttpResponse(User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).role, status=201)
+    return HttpResponse(User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).role)
 
 
 def usersusersee(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid', status=201)
+        return HttpResponse('User Not Valid', status=401)
     if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
-        return HttpResponse('Room Not Started', status=201)
+        return HttpResponse('Room Not Started', status=409)
 
     # return users that user can see
     userscount = 0
@@ -145,44 +145,64 @@ def usersusersee(request, roomid, userid, userpsw):
             userscount += 1
             response[f'user{userscount}'] = user.userid
     response['userCount'] = userscount
-    return HttpResponse(json.dumps(response), status=201)
+    return HttpResponse(json.dumps(response))
 
 
 def message(request, roomid, userid, userpsw, messageid):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid', status=201)
+        return HttpResponse('User Not Valid', status=401)
     if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
-        return HttpResponse('Room Not Started', status=201)
+        return HttpResponse('Room Not Started', status=409)
     if(not Message.objects.filter(roomid=roomid, messageid=messageid).exists()):
-        return HttpResponse('Message Does Not Exist', status=201)
+        return HttpResponse('Message Does Not Exist', status=404)
     thisroom = Room.objects.get(roomid=roomid)
     if(messageid > thisroom.messagecount):
-        return HttpResponse('Message Does Not Exist', status=201)
+        return HttpResponse('Message Does Not Exist', status=404)
     thismessage = Message.objects.get(roomid=roomid, messageid=messageid)
     response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle, 'messageusers': thismessage.messageusers,
                 'message1users': thismessage.message1users, 'message2users': thismessage.message2users}
-    return HttpResponse(json.dumps(response), status=201)
+    return HttpResponse(json.dumps(response))
 
 
 def messagecount(request, roomid):
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
-    return HttpResponse(Room.objects.get(roomid=roomid).messagecount, status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
+    return HttpResponse(Room.objects.get(roomid=roomid).messagecount)
+
+
+def allmessage(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist', status=401)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid', status=401)
+    thisroom = Room.objects.get(roomid=roomid)
+    messagecount = thisroom.messagecount
+    messages = Message.objects.filter(roomid=roomid)
+
+    res = {'messagecount': messagecount}
+    count = 0
+    for message in messages:
+        count += 1
+        res[f'messagetitle{count}'] = message.messagetitle
+        res[f'messageusers{count}'] = message.messageusers
+        res[f'message1users{count}'] = message.message1users
+        res[f'message2users{count}'] = message.message2users
+    return HttpResponse(json.dumps(res))
 
 
 def buildteam(request, roomid, userid, userpsw, count):
 
     if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist', status=201)
+        return HttpResponse('Room Does Not Exist', status=401)
     thisroom = Room.objects.get(roomid=roomid)
     if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid', status=201)
+        return HttpResponse('User Not Valid', status=401)
     if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started', status=201)
+        return HttpResponse('Room Not Started', status=409)
     if(thisroom.roomfurtherstatus != 'normal'):
-        return HttpResponse('A Vote is on Going', status=201)
+        return HttpResponse('A Vote is on Going', status=409)
     #thisroom.votetitle = 'Team Building Proposal'
     #thisroom.roomfurtherstatus = 'build'
     thisroom.teambuilder = userid
