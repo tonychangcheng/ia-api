@@ -18,6 +18,7 @@ from django.urls import path
 from room.views import createroom, joinroom, getWaitingRoomInfo, roomstatus, testdjango
 from room.views import startGame, userrole, usersusersee, message, messagecount, buildteam
 from room.views import addteammember, anybuild, votecontent, anyquest, vote, voted
+from room.views import get_csrf_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,5 +38,6 @@ urlpatterns = [
     path('votecontent/<str:roomid>/<str:userid>/<str:userpsw>/', votecontent),
     path('anyquest/<str:roomid>/<str:userid>/<str:userpsw>/', anyquest),
     path('vote/<str:roomid>/<str:userid>/<str:userpsw>/<str:choice>/', vote),
-    path('voted/<str:roomid>/<str:userid>/<str:userpsw>/', voted)
+    path('voted/<str:roomid>/<str:userid>/<str:userpsw>/', voted),
+    path('get_csrf_token/', get_csrf_token, name='get_csrf_token')
 ]

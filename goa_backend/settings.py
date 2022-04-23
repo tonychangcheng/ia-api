@@ -31,9 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
 
     'room.apps.RoomConfig',
-    'corsheaders',
 
 
     'django.contrib.admin',
@@ -46,15 +46,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
 
+
+    'django.middleware.csrf.CsrfViewMiddleware',
+
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
+
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-
-    'corsheaders.middleware.CorsPostCsrfMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -85,7 +87,13 @@ CSRF_TRUSTED_ORIGINS = [
     "http://59.78.35.89:7998",
 ]
 
+
 CORS_ALLOW_CREDENTIALS = True
+
+#SESSION_COOKIE_SECURE = True
+#SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
 
 
 ROOT_URLCONF = 'goa_backend.urls'

@@ -7,9 +7,15 @@ from django.shortcuts import render
 from .models import Room, checkRoomExist, createValidRoom
 from .models import User, checkUserExist, checkUserValid, createValidUser
 from .models import getRoomUser, getRoomStatus, Message
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.middleware.csrf import get_token
 
 # Create your views here.
+
+
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'token': csrf_token})
 
 
 def createroom(request, roomid):
@@ -48,7 +54,9 @@ def getWaitingRoomInfo(request, roomid, userid, userpsw):
 
 
 def testdjango(request):
-    return HttpResponse('It worked', status=201)
+    data = json.loads(request.body)
+    res = data['data1']
+    return HttpResponse(res, status=201)
 
 
 character = ['Merlin', 'Percival', 'Morgana',
