@@ -363,6 +363,8 @@ def vote(request, roomid, userid, userpsw, choice):
     if(thisroom.roomfurtherstatus == 'normal'):
         return HttpResponse('No Vote is on Going')
     thisuser = User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw)
+    if(thisuser.voted == True):
+        return HttpResponse('Already Voted')
     thisuser.voted = True
     thisuser.result = choice == 'yes'
     thisuser.save()
