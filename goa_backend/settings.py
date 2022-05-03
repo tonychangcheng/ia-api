@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from ..config import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'l3tckcw1_-@$%k%!h0k$rpx&#y2jjyq8u72ay!-8f2e(8=rjd$'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config['DEBUG']
 
-ALLOWED_HOSTS = ['59.78.35.89', '127.0.0.1']
+ALLOWED_HOSTS = config['BACKEND_URLs']
 
 
 # Application definition
@@ -67,10 +68,7 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True
 '''
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-    'http://59.78.35.89:7998',
-]
+CORS_ALLOWED_ORIGINS = config['FRONTEND_URLs']
 
 
 CORS_ALLOW_METHODS = [
@@ -82,10 +80,7 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8080",
-    "http://59.78.35.89:7998",
-]
+CSRF_TRUSTED_ORIGINS = config['FRONTEND_URLs']
 
 
 CORS_ALLOW_CREDENTIALS = True
