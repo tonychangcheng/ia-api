@@ -1,5 +1,5 @@
 # config
-config.py
+/goa_backend/config.py
 
 # Django #
 *.log
