@@ -24,6 +24,30 @@ def createroom(request, roomid):
     return createValidRoom(roomid)
 
 
+def checkString(string):
+    res = {
+        'number': False,
+        'lowLetter': False,
+        'upLetter': False,
+        'underline': False,
+        'otherChar': False,
+        'length': 0
+    }
+    res['length'] = len(string)
+    for letter in string:
+        if('0' <= letter and letter <= '9'):
+            res['number'] = True
+        elif('a' <= letter and letter <= 'z'):
+            res['lowLetter'] = True
+        elif('A' <= letter and letter <= 'Z'):
+            res['upLetter'] = True
+        elif('-' == letter):
+            res['underline'] = True
+        else:
+            res['otherChar'] = True
+    return res
+
+
 def joinroom(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist')
