@@ -189,30 +189,6 @@ def usersusersee(request, roomid, userid, userpsw):
     return HttpResponse(json.dumps(response))
 
 
-def message(request, roomid, userid, userpsw, messageid):
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    if(not Message.objects.filter(roomid=roomid, messageid=messageid).exists()):
-        return HttpResponse('Message Does Not Exist', status=404)
-    thisroom = Room.objects.get(roomid=roomid)
-    if(messageid > thisroom.messagecount):
-        return HttpResponse('Message Does Not Exist', status=404)
-    thismessage = Message.objects.get(roomid=roomid, messageid=messageid)
-    response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle, 'messageusers': thismessage.messageusers,
-                'message1users': thismessage.message1users, 'message2users': thismessage.message2users}
-    return HttpResponse(json.dumps(response))
-
-
-def messagecount(request, roomid):
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    return HttpResponse(Room.objects.get(roomid=roomid).messagecount)
-
-
 def allmessage(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist')
@@ -231,31 +207,6 @@ def allmessage(request, roomid, userid, userpsw):
         res[f'message1users{count}'] = message.message1users
         res[f'message2users{count}'] = message.message2users
     return HttpResponse(json.dumps(res))
-
-
-def buildteam(request, roomid, userid, userpsw, count):
-
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    thisroom = Room.objects.get(roomid=roomid)
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    if(thisroom.roomfurtherstatus != 'normal'):
-        return HttpResponse('A Vote is on Going')
-    #thisroom.votetitle = 'Team Building Proposal'
-    #thisroom.roomfurtherstatus = 'build'
-    thisroom.teambuilder = userid
-    for user in User.objects.filter(roomid=roomid):
-        user.onvote = False
-        user.save()
-    thisroom.teammembercount = count
-    thisroom.teammembercountnow = 0
-    thisroom.votetitle = 'Team Building Proposal'
-    thisroom.votecontent = f'Builder: {userid} | Team Members: '
-    thisroom.save()
-    return HttpResponse('Start Build Team', status=201)
 
 
 def newbuildteam(request, roomid, userid, userpsw):
@@ -294,35 +245,6 @@ def newbuildteam(request, roomid, userid, userpsw):
     return HttpResponse('Start Build Team', status=201)
 
 
-def addteammember(request, roomid, userid, userpsw, memberid):
-
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    thisroom = Room.objects.get(roomid=roomid)
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    if(thisroom.roomfurtherstatus != 'normal'):
-        return HttpResponse('A Vote is on Going')
-    if(userid != thisroom.teambuilder):
-        return HttpResponse('You are not team builder')
-
-    thismember = User.objects.get(roomid=roomid, userid=memberid)
-    if(thismember.onvote == False):
-        thismember.onvote = True
-        thisroom.teammembercountnow += 1
-        thisroom.votecontent += memberid
-        if(thisroom.teammembercount != thisroom.teammembercountnow):
-            thisroom.votecontent += ', '
-        else:
-            thisroom.roomfurtherstatus = 'build'
-            startvote(roomid)
-    thisroom.save()
-    thismember.save()
-    return HttpResponse(thisroom.teammembercountnow, status=201)
-
-
 def startvote(roomid):
     for user in User.objects.filter(roomid=roomid):
         user.voted = False
@@ -357,42 +279,6 @@ def allroominfo(request, roomid, userid, userpsw):
         return HttpResponse(json.dumps(res))
 
 
-def anybuild(request, roomid, userid, userpsw):
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    thisroom = Room.objects.get(roomid=roomid)
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    return HttpResponse(thisroom.roomfurtherstatus == 'build')
-
-
-def votecontent(request, roomid, userid, userpsw):
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    thisroom = Room.objects.get(roomid=roomid)
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    if(thisroom.roomfurtherstatus == 'normal'):
-        return HttpResponse('No Vote is on Going')
-    return HttpResponse(thisroom.votecontent)
-
-
-def anyquest(request, roomid, userid, userpsw):
-    if(not checkRoomExist(roomid)):
-        return HttpResponse('Room Does Not Exist')
-    thisroom = Room.objects.get(roomid=roomid)
-    if(not checkUserValid(roomid, userid, userpsw)):
-        return HttpResponse('User Not Valid')
-    if(thisroom.roomstatus != 'started'):
-        return HttpResponse('Room Not Started')
-    # return HttpResponse(thisroom.roomfurtherstatus == 'quest' and User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).onvote, status=201)
-    return HttpResponse(thisroom.roomfurtherstatus == 'quest')
-
-
 def vote(request, roomid, userid, userpsw, choice):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist')
@@ -410,7 +296,7 @@ def vote(request, roomid, userid, userpsw, choice):
     thisuser.result = choice == 'yes'
     thisuser.save()
 
-    #
+    # deal with complete voting
     if(thisroom.roomfurtherstatus == 'build'):
         votedusercount = len(User.objects.filter(roomid=roomid, voted=True))
     else:
@@ -421,7 +307,7 @@ def vote(request, roomid, userid, userpsw, choice):
 
         # message.messageusers
         totalcount = len(User.objects.filter(roomid=roomid, onvote=True))
-        messageusers = ''
+        messageusers = 'Builder: ' + thisroom.teambuilder + ' | '
         count = 0
         for user in User.objects.filter(roomid=roomid, onvote=True):
             count += 1
@@ -467,7 +353,7 @@ def vote(request, roomid, userid, userpsw, choice):
         # message.messageusers
         totalcount = len(User.objects.filter(
             roomid=roomid, voted=True, onvote=True))
-        messageusers = ''
+        messageusers = 'Builder: ' + thisroom.teambuilder + ' | '
         count = 0
         for user in User.objects.filter(roomid=roomid, voted=True, onvote=True):
             count += 1
@@ -487,6 +373,86 @@ def vote(request, roomid, userid, userpsw, choice):
     return HttpResponse('Successfully Vote', status=201)
 
 
+##################### no longer used #####################
+
+def message(request, roomid, userid, userpsw, messageid):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(Room.objects.get(roomid=roomid).roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    if(not Message.objects.filter(roomid=roomid, messageid=messageid).exists()):
+        return HttpResponse('Message Does Not Exist', status=404)
+    thisroom = Room.objects.get(roomid=roomid)
+    if(messageid > thisroom.messagecount):
+        return HttpResponse('Message Does Not Exist', status=404)
+    thismessage = Message.objects.get(roomid=roomid, messageid=messageid)
+    response = {'messageid': thismessage.messageid, 'messagetitle': thismessage.messagetitle, 'messageusers': thismessage.messageusers,
+                'message1users': thismessage.message1users, 'message2users': thismessage.message2users}
+    return HttpResponse(json.dumps(response))
+
+
+def messagecount(request, roomid):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    return HttpResponse(Room.objects.get(roomid=roomid).messagecount)
+
+
+def buildteam(request, roomid, userid, userpsw, count):
+
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    if(thisroom.roomfurtherstatus != 'normal'):
+        return HttpResponse('A Vote is on Going')
+    #thisroom.votetitle = 'Team Building Proposal'
+    #thisroom.roomfurtherstatus = 'build'
+    thisroom.teambuilder = userid
+    for user in User.objects.filter(roomid=roomid):
+        user.onvote = False
+        user.save()
+    thisroom.teammembercount = count
+    thisroom.teammembercountnow = 0
+    thisroom.votetitle = 'Team Building Proposal'
+    thisroom.votecontent = f'Builder: {userid} | Team Members: '
+    thisroom.save()
+    return HttpResponse('Start Build Team', status=201)
+
+
+def addteammember(request, roomid, userid, userpsw, memberid):
+
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    if(thisroom.roomfurtherstatus != 'normal'):
+        return HttpResponse('A Vote is on Going')
+    if(userid != thisroom.teambuilder):
+        return HttpResponse('You are not team builder')
+
+    thismember = User.objects.get(roomid=roomid, userid=memberid)
+    if(thismember.onvote == False):
+        thismember.onvote = True
+        thisroom.teammembercountnow += 1
+        thisroom.votecontent += memberid
+        if(thisroom.teammembercount != thisroom.teammembercountnow):
+            thisroom.votecontent += ', '
+        else:
+            thisroom.roomfurtherstatus = 'build'
+            startvote(roomid)
+    thisroom.save()
+    thismember.save()
+    return HttpResponse(thisroom.teammembercountnow, status=201)
+
+
 def voted(request, roomid, userid, userpsw):
     if(not checkRoomExist(roomid)):
         return HttpResponse('Room Does Not Exist')
@@ -500,3 +466,39 @@ def voted(request, roomid, userid, userpsw):
     thisuser = User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw)
 
     return HttpResponse(thisuser.voted or (thisroom.roomfurtherstatus == 'quest' and thisuser.onvote == False))
+
+
+def anyquest(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    # return HttpResponse(thisroom.roomfurtherstatus == 'quest' and User.objects.get(roomid=roomid, userid=userid, userpsw=userpsw).onvote, status=201)
+    return HttpResponse(thisroom.roomfurtherstatus == 'quest')
+
+
+def anybuild(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    return HttpResponse(thisroom.roomfurtherstatus == 'build')
+
+
+def votecontent(request, roomid, userid, userpsw):
+    if(not checkRoomExist(roomid)):
+        return HttpResponse('Room Does Not Exist')
+    thisroom = Room.objects.get(roomid=roomid)
+    if(not checkUserValid(roomid, userid, userpsw)):
+        return HttpResponse('User Not Valid')
+    if(thisroom.roomstatus != 'started'):
+        return HttpResponse('Room Not Started')
+    if(thisroom.roomfurtherstatus == 'normal'):
+        return HttpResponse('No Vote is on Going')
+    return HttpResponse(thisroom.votecontent)
