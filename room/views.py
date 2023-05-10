@@ -318,7 +318,7 @@ def vote(request, roomid, userid, userpsw, choice):
         # message.message1users
         agree = len(User.objects.filter(
             roomid=roomid, voted=True, result=True))
-        agreeuser = f'{agree} Yes: '
+        agreeuser = f'{agree} Yes{(": " if agree>0 else "")}'
         count = 0
         for user in User.objects.filter(roomid=roomid, voted=True, result=True):
             count += 1
@@ -329,7 +329,7 @@ def vote(request, roomid, userid, userpsw, choice):
         # message.message2users
         disagree = len(User.objects.filter(
             roomid=roomid, voted=True, result=False))
-        disagreeuser = f'{disagree} No: '
+        disagreeuser = f'{disagree} No{(": " if disagree>0 else "")}'
         count = 0
         for user in User.objects.filter(roomid=roomid, voted=True, result=False):
             count += 1
