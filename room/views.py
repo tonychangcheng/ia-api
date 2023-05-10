@@ -366,7 +366,7 @@ def vote(request, roomid, userid, userpsw, choice):
         disagree = len(User.objects.filter(
             roomid=roomid, voted=True, onvote=True, result=False))
         Message.objects.create(roomid=roomid, messageid=thisroom.messagecount+1,
-                               messagetitle=f'Quest#{thisroom.questcount}', messageusers=messageusers, message1users=f'{agree} Yes', message2users=f'{disagree} No')
+                               messagetitle=f'Quest #{thisroom.questcount}', messageusers=messageusers, message1users=f'{agree} Yes', message2users=f'{disagree} No')
         thisroom.messagecount += 1
         thisroom.roomfurtherstatus = 'normal'
         thisroom.save()
