@@ -337,12 +337,12 @@ def vote(request, roomid, userid, userpsw, choice):
             if(count < disagree):
                 disagreeuser += ', '
         Message.objects.create(roomid=roomid, messageid=thisroom.messagecount+1,
-                               messagetitle=f'Team Building Proposal#{thisroom.messagecount-thisroom.questcount+1}', messageusers=messageusers, message1users=agreeuser, message2users=disagreeuser)
+                               messagetitle=f'Team Building Proposal #{thisroom.messagecount-thisroom.questcount+1}', messageusers=messageusers, message1users=agreeuser, message2users=disagreeuser)
         thisroom.messagecount += 1
         if(agree > disagree):
             thisroom.questcount += 1
             thisroom.roomfurtherstatus = 'quest'
-            thisroom.votetitle = f'Quest#{thisroom.questcount}'
+            thisroom.votetitle = f'Quest #{thisroom.questcount}'
             startvote(roomid)
         else:
             thisroom.roomfurtherstatus = 'normal'
