@@ -91,9 +91,10 @@ def getWaitingRoomInfo(request, roomid, userid, userpsw):
     if checkUserValid(roomid, userid, userpsw):
         return HttpResponse(
             json.dumps(
-                getRoomUser(roomid).update(
-                    {"roomstatus": getRoomStatus(roomid)}
-                )
+                {
+                    **getRoomUser(roomid),
+                    **{"roomstatus": getRoomStatus(roomid)},
+                }
             )
         )
     else:
