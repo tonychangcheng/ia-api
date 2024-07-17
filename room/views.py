@@ -268,6 +268,12 @@ def newbuildteam(request, roomid, userid, userpsw):
     if thisroom.roomfurtherstatus != "normal":
         return HttpResponse("A Vote is on Going")
     da = json.loads(request.body)
+    if (
+        "teammembercount" not in da
+        or not isinstance(da["teammembercount"], int)
+        or da["teammembercount"] < 2
+    ):
+        return HttpResponse("Team Build Invalid")
     thisroom.teambuilder = userid
     for user in User.objects.filter(roomid=roomid):
         user.onvote = False
