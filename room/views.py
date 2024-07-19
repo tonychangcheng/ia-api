@@ -417,7 +417,7 @@ def vote(request, roomid, userid, userpsw, choice):
             thisroom.roomfurtherstatus = "normal"
         thisroom.save()
     # quest->over?
-    if thisroom.roomfurtherstatus == "quest" and votedusercount == len(
+    elif thisroom.roomfurtherstatus == "quest" and votedusercount == len(
         User.objects.filter(roomid=roomid, onvote=True)
     ):
 
