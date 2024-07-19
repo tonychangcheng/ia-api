@@ -281,7 +281,7 @@ def newbuildteam(request, roomid, userid, userpsw):
     thisroom.teammembercount = da["teammembercount"]
     thisroom.teammembercountnow = 0
     thisroom.votetitle = "任务队伍提名"
-    thisroom.votecontent = f"领袖：{userid} | 任务队伍："
+    thisroom.votecontent = f"队长：{userid} | 队伍："
     for i in range(1, da["teammembercount"] + 1):
         memberid = da[f"teammember{i}"]
         if not checkUserExist(roomid, memberid):
@@ -364,7 +364,7 @@ def vote(request, roomid, userid, userpsw, choice):
 
         # message.messageusers
         totalcount = len(User.objects.filter(roomid=roomid, onvote=True))
-        messageusers = "领袖：" + thisroom.teambuilder + " | 任务队伍："
+        messageusers = "队长：" + thisroom.teambuilder + " | 队伍："
         count = 0
         for user in User.objects.filter(roomid=roomid, onvote=True):
             count += 1
@@ -402,7 +402,7 @@ def vote(request, roomid, userid, userpsw, choice):
         Message.objects.create(
             roomid=roomid,
             messageid=thisroom.messagecount + 1,
-            messagetitle=f"任务队伍提名 #{thisroom.messagecount-thisroom.questcount+1}{' - 流局' if agree<=disagree else ''}",
+            messagetitle=f"队伍提名 #{thisroom.messagecount-thisroom.questcount+1}{' - 流局' if agree<=disagree else ''}",
             messageusers=messageusers,
             message1users=agreeuser,
             message2users=disagreeuser,
@@ -425,7 +425,7 @@ def vote(request, roomid, userid, userpsw, choice):
         totalcount = len(
             User.objects.filter(roomid=roomid, voted=True, onvote=True)
         )
-        messageusers = "领袖：" + thisroom.teambuilder + " | 任务队伍："
+        messageusers = "队长：" + thisroom.teambuilder + " | 队伍："
         count = 0
         for user in User.objects.filter(
             roomid=roomid, voted=True, onvote=True
@@ -511,7 +511,7 @@ def buildteam(request, roomid, userid, userpsw, count):
     thisroom.teammembercount = count
     thisroom.teammembercountnow = 0
     thisroom.votetitle = "任务队伍提名"
-    thisroom.votecontent = f"领袖：{userid} | 任务队伍："
+    thisroom.votecontent = f"队长：{userid} | 队伍："
     thisroom.save()
     return HttpResponse("Start Build Team", status=201)
 
