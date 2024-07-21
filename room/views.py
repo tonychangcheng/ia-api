@@ -37,7 +37,7 @@ def get_csrf_token(request):
 
 def createroom(request, roomid):
     if len(roomid) > 6:
-        return HttpResponse("RoomIDTooLong")
+        return HttpResponse("房间ID过长")
     if checkRoomExist(roomid):
         return HttpResponse("房间ID已存在")
     return createValidRoom(roomid)
