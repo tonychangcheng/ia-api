@@ -28,7 +28,8 @@ class Room(models.Model):
     roomstatus = models.CharField(max_length=7)  # waiting / started
     messagecount = models.IntegerField()
     roomfurtherstatus = models.CharField(
-        max_length=7)  # normal / build / quest
+        max_length=7
+    )  # normal / build / quest
     questcount = models.IntegerField()
     # Team Building Proposal / Quest#n Proposal
     votetitle = models.CharField(max_length=22)
@@ -62,9 +63,19 @@ def checkRoomExist(Roomid):
 
 
 def createValidRoom(Roomid):
-    Room.objects.create(roomid=Roomid, roomstatus='waiting',
-                        messagecount=0, roomfurtherstatus='normal', questcount=0, votetitle='', votecontent='', teammembercount=0, teammembercountnow=0, teambuilder='')
-    return HttpResponse('createdRoom', status=201)
+    Room.objects.create(
+        roomid=Roomid,
+        roomstatus="waiting",
+        messagecount=0,
+        roomfurtherstatus="normal",
+        questcount=0,
+        votetitle="",
+        votecontent="",
+        teammembercount=0,
+        teammembercountnow=0,
+        teambuilder="",
+    )
+    return HttpResponse("createdRoom", status=201)
 
 
 def checkUserExist(Roomid, Userid):
@@ -72,22 +83,31 @@ def checkUserExist(Roomid, Userid):
 
 
 def checkUserValid(Roomid, Userid, Userpsw):
-    return User.objects.filter(roomid=Roomid, userid=Userid, userpsw=Userpsw).exists()
+    return User.objects.filter(
+        roomid=Roomid, userid=Userid, userpsw=Userpsw
+    ).exists()
 
 
 def createValidUser(Roomid, Userid, Userpsw):
-    User.objects.create(roomid=Roomid, userid=Userid,
-                        userpsw=Userpsw, role='not distrubuted', onvote=False, voted=False, result=False)
-    return HttpResponse('createdUser', status=201)
+    User.objects.create(
+        roomid=Roomid,
+        userid=Userid,
+        userpsw=Userpsw,
+        role="not distrubuted",
+        onvote=False,
+        voted=False,
+        result=False,
+    )
+    return HttpResponse("createdUser", status=201)
 
 
 def getRoomUser(Roomid):
     Users = User.objects.filter(roomid=Roomid)
-    response = {'userCount': len(Users)}
+    response = {"userCount": len(Users)}
     useri = 0
     for user in Users:
         useri += 1
-        response[f'user{useri}'] = user.userid
+        response[f"user{useri}"] = user.userid
     return response
 
 

@@ -36,6 +36,8 @@ def get_csrf_token(request):
 
 
 def createroom(request, roomid):
+    if len(roomid) > 6:
+        return HttpResponse("RoomIDTooLong")
     if checkRoomExist(roomid):
         return HttpResponse("房间ID已存在")
     return createValidRoom(roomid)
@@ -68,6 +70,8 @@ def checkString(string):
 def joinroom(request, roomid, userid, userpsw):
     if not checkRoomExist(roomid):
         return HttpResponse("房间不存在")
+    if(len(userid)>7 or len(userpsw)>6):
+        return HttpResponse("UserID or password too long")
     if checkUserExist(roomid, userid):
         if checkUserValid(roomid, userid, userpsw):
             return HttpResponse("userExistAndValid")
