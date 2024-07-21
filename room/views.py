@@ -70,8 +70,8 @@ def checkString(string):
 def joinroom(request, roomid, userid, userpsw):
     if not checkRoomExist(roomid):
         return HttpResponse("房间不存在")
-    if(len(userid)>7 or len(userpsw)>6):
-        return HttpResponse("UserID or password too long")
+    if len(userid) > 7 or len(userpsw) > 6:
+        return HttpResponse("玩家ID或密码过长")
     if checkUserExist(roomid, userid):
         if checkUserValid(roomid, userid, userpsw):
             return HttpResponse("userExistAndValid")
