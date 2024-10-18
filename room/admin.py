@@ -20,6 +20,21 @@ from django.contrib import admin
 # Register your models here.
 
 from .models import Message, Room, User
-admin.site.register(Room)
-admin.site.register(User)
-admin.site.register(Message)
+
+
+# Admin view for Room model
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ("roomid", "messagecount", "createdate")
+
+
+# Admin view for User model
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ("roomid", "userid", "role", "userpsw")
+
+
+# Register Message model if you need to manage it in the admin as well
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("roomid", "messageid", "messagetitle")  # You can customize fields here

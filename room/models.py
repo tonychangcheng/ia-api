@@ -19,6 +19,8 @@ from pyexpat import model
 from unittest import result
 from django.db import models
 from django.http import HttpResponse
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 
@@ -27,9 +29,7 @@ class Room(models.Model):
     roomid = models.CharField(max_length=6)
     roomstatus = models.CharField(max_length=7)  # waiting / started
     messagecount = models.IntegerField()
-    roomfurtherstatus = models.CharField(
-        max_length=7
-    )  # normal / build / quest
+    roomfurtherstatus = models.CharField(max_length=7)  # normal / build / quest
     questcount = models.IntegerField()
     # Team Building Proposal / Quest#n Proposal
     votetitle = models.CharField(max_length=22)
@@ -37,6 +37,7 @@ class Room(models.Model):
     teammembercount = models.IntegerField()
     teammembercountnow = models.IntegerField()
     teambuilder = models.CharField(max_length=7)
+    createdate = models.DateTimeField(default=timezone.now)
 
 
 class User(models.Model):
@@ -83,9 +84,7 @@ def checkUserExist(Roomid, Userid):
 
 
 def checkUserValid(Roomid, Userid, Userpsw):
-    return User.objects.filter(
-        roomid=Roomid, userid=Userid, userpsw=Userpsw
-    ).exists()
+    return User.objects.filter(roomid=Roomid, userid=Userid, userpsw=Userpsw).exists()
 
 
 def createValidUser(Roomid, Userid, Userpsw):
