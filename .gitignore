@@ -3,6 +3,7 @@
 /static
 /uwsgi_params
 /goa_backend.ini
+/room/migrations/
 
 # Django #
 *.log
