@@ -377,14 +377,10 @@ def vote(request, roomid, userid, userpsw, choice):
                 messageusers += ", "
 
         # message.message1users
-        agree = len(
-            User.objects.filter(roomid=roomid, voted=True, result=True)
-        )
+        agree = len(User.objects.filter(roomid=roomid, voted=True, result=True))
         agreeuser = f'{agree} 赞同{("：" if agree>0 else "")}'
         count = 0
-        for user in User.objects.filter(
-            roomid=roomid, voted=True, result=True
-        ):
+        for user in User.objects.filter(roomid=roomid, voted=True, result=True):
             count += 1
             agreeuser += user.userid
             if count < agree:
@@ -431,9 +427,7 @@ def vote(request, roomid, userid, userpsw, choice):
         )
         messageusers = "队长：" + thisroom.teambuilder + " | 队伍："
         count = 0
-        for user in User.objects.filter(
-            roomid=roomid, voted=True, onvote=True
-        ):
+        for user in User.objects.filter(roomid=roomid, voted=True, onvote=True):
             count += 1
             messageusers += user.userid
             if count < totalcount:
@@ -452,7 +446,7 @@ def vote(request, roomid, userid, userpsw, choice):
         Message.objects.create(
             roomid=roomid,
             messageid=thisroom.messagecount + 1,
-            messagetitle=f"任务 #{thisroom.questcount} - {'成功' if disagree==0 else '失败'}",
+            messagetitle=f"任务 #{thisroom.questcount}",
             messageusers=messageusers,
             message1users=f"{agree} 成功",
             message2users=f"{disagree} 失败",
