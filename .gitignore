@@ -1,5 +1,5 @@
 # config
-/goa_backend/config.py
+# /goa_backend/config.py
 /static
 /uwsgi_params
 /goa_backend.ini
