@@ -22,7 +22,8 @@ config = {
     'SECRET_KEY': '&el+tpq6nk9=z^ux5jqlrxc!xwn5y#lycodv-(y3_l%9$v&5nr',
     # url where the backend is deployed
     'BACKEND_URLs': [
-        '127.0.0.1'
+        '127.0.0.1',
+        'ia-api-qmw9.onrender.com'
     ],
     # url where the frontend is deployed
     'FRONTEND_URLs': [
