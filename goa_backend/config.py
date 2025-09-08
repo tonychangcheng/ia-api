@@ -23,10 +23,11 @@ config = {
     # url where the backend is deployed
     'BACKEND_URLs': [
         '127.0.0.1',
-        'ia-api-qmw9.onrender.com'
+        'https://ia-api-qmw9.onrender.com'
     ],
     # url where the frontend is deployed
     'FRONTEND_URLs': [
-        'http://localhost:8080'
+        'http://localhost:8080',
+        'https://view-3d-demo.onrender.com'
     ]
 }
