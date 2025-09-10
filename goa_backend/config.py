@@ -23,7 +23,7 @@ config = {
     # url where the backend is deployed
     'BACKEND_URLs': [
         # '127.0.0.1',
-        'https://ia-api-qmw9.onrender.com'
+        'ia-api-qmw9.onrender.com'
     ],
     # url where the frontend is deployed
     'FRONTEND_URLs': [
