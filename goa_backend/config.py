@@ -28,6 +28,6 @@ config = {
     # url where the frontend is deployed
     'FRONTEND_URLs': [
         # 'http://localhost:8080',
-        'https://view-3d-demo.onrender.com'
+        'https://ia-mcsc8090.onrender.com'
     ]
 }
