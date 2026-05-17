@@ -112,24 +112,26 @@ def testdjango(request):
 
 
 character = [
-    "Merlin",
-    "Percival",
-    "Morgana",
-    "Assassin",
     "Loyal Servant of Arther",
-    "Oberon",
-    "Mordred",
+    "Cleric",
+    "Youth",
+    "Troublemaker",
+    "Duke",
+    "Archduke",
     "Minion of Mordred",
+    "Morgan le Fey",
+    "Blind Hunter"
 ]
 """
-                                                    0 Merlin
-                                                    1 Percival
-                                                    2 Morgana
-                                                    3 Assassin
-                                                    4 Loyal Servant of Arther
-                                                    5 Oberon
-                                                    6 Mordred
-                                                    7 Minion of Mordred
+                                                    0 Loyal Servant of Arther
+                                                    1 Cleric
+                                                    2 Youth
+                                                    3 Troublemaker
+                                                    4 Duke
+                                                    5 Archduke
+                                                    6 Minion of Mordred
+                                                    7 Morgan le Fey
+                                                    8 Blind Hunter
 """
 
 template = [
@@ -137,13 +139,13 @@ template = [
     "",
     "",
     "",
-    "",
-    [5, 0, 1, 2, 3, 4],
-    [6, 0, 1, 2, 3, 4, 4],
-    [7, 0, 1, 2, 3, 4, 4, 5],
-    [8, 0, 1, 2, 3, 4, 4, 4, 7],
-    [9, 0, 1, 2, 3, 6, 4, 4, 4, 4],
-    [10, 0, 1, 2, 3, 6, 4, 4, 4, 4, 5],
+    [4, 0, 1, 7, 8],
+    [5, 0, 1, 6, 7, 8],
+    [6, 1, 2, 4, 6, 7, 8],
+    [7, 1, 2, 4, 6, 6, 7, 8],
+    [8, 0, 1, 3, 4, 6, 6, 7, 8],
+    [9, 0, 1, 2, 5, 6, 6, 6, 7, 8],
+    [10, 0, 1, 3, 4, 5, 6, 6, 6, 7, 8]
 ]
 
 
@@ -209,30 +211,14 @@ def usersusersee(request, roomid, userid, userpsw):
         ul = user.role
         tl = thisuser.role
         flag = flag or (
-            tl == "Merlin"
+            tl == "Minion of Mordred"
             and (
-                ul == "Morgana"
-                or ul == "Assassin"
+                ul == "Morgan le Fey"
                 or ul == "Minion of Mordred"
-                or ul == "Oberon"
             )
         )
         flag = flag or (
-            tl == "Percival" and (ul == "Merlin" or ul == "Morgana")
-        )
-        flag = flag or (
-            (
-                tl == "Assassin"
-                or tl == "Morgana"
-                or tl == "Mordred"
-                or tl == "Minion of Mordred"
-            )
-            and (
-                ul == "Assassin"
-                or ul == "Morgana"
-                or ul == "Mordred"
-                or ul == "Minion of Mordred"
-            )
+            tl == "Morgan le Fey" and ul == "Minion of Mordred"
         )
         if flag:
             userscount += 1
