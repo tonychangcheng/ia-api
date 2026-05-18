@@ -26,6 +26,7 @@ from .models import User, checkUserExist, checkUserValid, createValidUser
 from .models import getRoomUser, getRoomStatus, Message
 from django.http import HttpResponse, JsonResponse
 from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -247,6 +248,7 @@ def allmessage(request, roomid, userid, userpsw):
     return HttpResponse(json.dumps(res))
 
 
+@csrf_exempt
 def newbuildteam(request, roomid, userid, userpsw):
     if not checkRoomExist(roomid):
         return HttpResponse("Room Does Not Exist")
@@ -283,7 +285,7 @@ def newbuildteam(request, roomid, userid, userpsw):
         if thisroom.teammembercount != thisroom.teammembercountnow:
             thisroom.votecontent += ", "
         thismember.save()
-    thisroom.roomfurtherstatus = "build"
+    thisroom.roomfurtherstatus = "quest"
     thisroom.save()
     startvote(roomid)
     return HttpResponse("Start Build Team", status=201)
