@@ -28,6 +28,7 @@ config = {
     # url where the frontend is deployed
     'FRONTEND_URLs': [
         # 'http://localhost:8080',
+        'https://avalon2-mcsc8090.onrender.com',
         'https://ia-mcsc8090.onrender.com'
     ]
 }
